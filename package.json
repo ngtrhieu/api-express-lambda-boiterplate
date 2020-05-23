@@ -1,0 +1,59 @@
+{
+  "name": "base-lambda-api",
+  "version": "1.0.0",
+  "description": "A base express API server wrapped in AWS lambda. Can be used as a lambda layer or a boiterplate.",
+  "main": "src/index.js",
+  "author": "ngtrhieu",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "prebuild": "rimraf dist",
+    "build": "cross-env NODE_ENV=development babel src -d dist",
+    "prestart": "yarn build",
+    "start": "node -r dotenv/config --enable-source-maps dist",
+    "lint": "eslint .",
+    "lint:fix": "eslint --fix",
+    "lint:staged": "lint-staged"
+  },
+  "pre-commit": "lint:staged",
+  "lint-staged": {
+    "*.js": [
+      "yarn lint:fix",
+      "git add --force"
+    ],
+    "*.json": [
+      "prettier --write",
+      "git add --force"
+    ]
+  },
+  "dependencies": {
+    "@babel/runtime": "^7.9.6",
+    "aws-sdk": "^2.683.0",
+    "aws-serverless-express": "^3.3.8",
+    "body-parser": "^1.19.0",
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "express-winston": "^4.0.3",
+    "winston": "^3.2.1"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.8.4",
+    "@babel/core": "^7.9.6",
+    "@babel/plugin-transform-runtime": "^7.9.6",
+    "@babel/preset-env": "^7.9.6",
+    "babel-eslint": "^10.1.0",
+    "babel-plugin-root-import": "^6.5.0",
+    "cross-env": "^7.0.2",
+    "dotenv": "^8.2.0",
+    "eslint": "^7.1.0",
+    "eslint-config-airbnb-base": "^14.1.0",
+    "eslint-config-prettier": "^6.11.0",
+    "eslint-import-resolver-babel-plugin-root-import": "^1.1.1",
+    "eslint-plugin-import": "^2.20.2",
+    "eslint-plugin-prettier": "^3.1.3",
+    "lint-staged": "^10.2.6",
+    "pre-commit": "^1.2.2",
+    "prettier": "^2.0.5",
+    "rimraf": "^3.0.2"
+  }
+}
