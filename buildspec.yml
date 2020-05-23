@@ -1,0 +1,23 @@
+# CodeBuild buildspec
+
+version: 0.2
+
+env:
+  variable:
+    NODE_ENVIRONMENT: development
+
+phases:
+  # Build phase
+  # install ALL npm packages and build the project
+  build:
+    commands:
+      - yarn install
+      - yarn build
+    finally:
+      - echo build phase completed.
+
+artifacts:
+  files:
+    - '**/*'
+  base-directory: dist
+  discard-paths: yes
