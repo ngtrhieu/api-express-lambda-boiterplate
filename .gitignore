@@ -1,10 +1,15 @@
 # dependencies
 /node_modules
 
+# settings
+/.vscode
+
 # generated folders
 /build
+/lambda
 /dist
 /logs
+lambda.zip
 
 # misc
 .DS_Store

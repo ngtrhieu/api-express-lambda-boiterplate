@@ -1,4 +1,4 @@
-module.exports = {
+const options = {
   presets: ['@babel/preset-env'],
   plugins: [
     [
@@ -8,3 +8,9 @@ module.exports = {
     ['@babel/transform-runtime'],
   ],
 };
+
+if (process.env.NODE_ENV === 'production') {
+  options.presets = [...options.presets, ['minify']];
+}
+
+module.exports = options;

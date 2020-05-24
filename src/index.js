@@ -1,9 +1,18 @@
+/**
+ * Lambda wrapper to deploy to AWS
+ */
+
+/* eslint-disable no-underscore-dangle */
+/* eslint-disable no-console */
+
+import awsServerlessExpress from 'aws-serverless-express';
 import app from './app';
-import logger from './logger';
 
-const port = process.env.PORT || 3000;
+const server = awsServerlessExpress.createServer(app);
+exports.handler = (event, context) => {
+  // HACK to make winston works!
+  delete console._stdout;
+  delete console._stderr;
 
-logger.info(`Start server locally on port ${port}`);
-app.listen(port, () => {
-  logger.info(`Server started on port ${port}`);
-});
+  awsServerlessExpress.proxy(server, event, context);
+};

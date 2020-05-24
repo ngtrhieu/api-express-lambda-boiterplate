@@ -12,12 +12,21 @@ phases:
   build:
     commands:
       - yarn install
-      - yarn build
+      - yarn build:prod
     finally:
       - echo build phase completed.
+
+  # Post build phase
+  # install PRODUCTION packages in dist/node_modules
+  # deploy only the dist folder to reduce lambda size
+  post_build:
+    commands:
+      - cp package.json dist/package.json
+      - cp yarn.lock dist/yarn.lock
+      - yarn --cwd dist install --prod
+      - echo post build phase completed.
 
 artifacts:
   files:
     - '**/*'
   base-directory: dist
-  discard-paths: yes

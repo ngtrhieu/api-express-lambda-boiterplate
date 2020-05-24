@@ -8,13 +8,15 @@
   "license": "MIT",
   "private": true,
   "scripts": {
-    "prebuild": "rimraf dist",
-    "build": "cross-env NODE_ENV=development babel src -d dist",
+    "clean": "rimraf dist",
+    "build": "yarn clean && cross-env NODE_ENV=development babel src -d dist",
+    "build:prod": "yarn clean && cross-env NODE_ENV=production babel src -d dist",
     "prestart": "yarn build",
-    "start": "node -r dotenv/config --enable-source-maps dist",
+    "start": "node -r dotenv/config --enable-source-maps dist/local",
     "lint": "eslint .",
     "lint:fix": "eslint --fix",
-    "lint:staged": "lint-staged"
+    "lint:staged": "lint-staged",
+    "zip": "yarn build:prod && cp package.json dist/package.json && cp yarn.lock dist/yarn.lock && yarn --cwd dist install --prod && cd dist && zip -r ../lambda.zip ./* && cd .."
   },
   "pre-commit": "lint:staged",
   "lint-staged": {
@@ -44,6 +46,7 @@
     "@babel/preset-env": "^7.9.6",
     "babel-eslint": "^10.1.0",
     "babel-plugin-root-import": "^6.5.0",
+    "babel-preset-minify": "^0.5.1",
     "cross-env": "^7.0.2",
     "dotenv": "^8.2.0",
     "eslint": "^7.1.0",
