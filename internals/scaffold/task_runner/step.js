@@ -27,10 +27,10 @@ class Step {
     this.execute = async () => {
       if (execute) {
         try {
-          logger.info(`- ${this.name}`);
+          logger.info(`\t- ${this.name}`);
           await execute();
         } catch (error) {
-          logger.error(`Executing "${this.name}" failed due to:\n%s`, error);
+          logger.error(`\tExecuting "${this.name}" failed due to:\n%s`, error);
           throw error;
         }
       }
@@ -39,10 +39,13 @@ class Step {
     this.rollback = async () => {
       if (rollback) {
         try {
-          logger.info(`- ROLLBACK "${this.name}"`);
+          logger.info(`\t- ROLLBACK "${this.name}"`);
           await rollback();
         } catch (error) {
-          logger.error(`Rolling back "${this.name}" failed due to:\n%s`, error);
+          logger.error(
+            `\tRolling back "${this.name}" failed due to:\n%s`,
+            error,
+          );
           throw error;
         }
       }

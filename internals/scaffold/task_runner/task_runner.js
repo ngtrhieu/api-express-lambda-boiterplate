@@ -25,6 +25,8 @@ class TaskRunner {
    * If one of the task failed, auto rollback, then reject the Promise.
    */
   execute = async () => {
+    logger.info(`Executing task runner "${this.name}"`);
+
     if (!this.tasks || this.tasks.length === 0) {
       logger.info('Nothing to execute');
       return;
@@ -46,31 +48,31 @@ class TaskRunner {
       throw error;
     }
 
-    logger.info(`Finished!`);
+    logger.info(`Task runner "${this.name}" executed!`);
   };
 
   _rollback = async (...tasks) => {
-    if (!tasks || tasks.length === 0) {
-      return;
-    }
+    logger.info(`Rolling back task runner "${this.name}"`);
 
-    const reversed = tasks.reverse();
-    let taskNo = reversed.length;
-    const totalTasks = reversed.length;
+    if (tasks && tasks.length !== 0) {
+      const reversed = tasks.reverse();
+      let taskNo = reversed.length;
+      const totalTasks = reversed.length;
 
-    try {
-      for (let i = 0; i < reversed.length; ++i) {
-        const task = reversed[i];
-        logger.info(`${taskNo}/${totalTasks}: ${task.name}`);
-        taskNo -= 1;
-        await task.rollback();
+      try {
+        for (let i = 0; i < reversed.length; ++i) {
+          const task = reversed[i];
+          logger.info(`${taskNo}/${totalTasks}: ROLLBACK "${task.name}"`);
+          taskNo -= 1;
+          await task.rollback();
+        }
+      } catch (error) {
+        logger.error(`Failed to rollback. Stopping...`);
+        throw error;
       }
-    } catch (error) {
-      logger.error(`Failed to rollback. Stopping...`);
-      throw error;
     }
 
-    logger.info(`Rollback finished!`);
+    logger.info(`Task runner "${this.name}" rollback completed!`);
   };
 }
 
