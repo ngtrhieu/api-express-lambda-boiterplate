@@ -51,7 +51,6 @@ class TaskRunner {
 
   _rollback = async (...tasks) => {
     if (!tasks || tasks.length === 0) {
-      logger.info('Nothing to rollback');
       return;
     }
 
@@ -71,7 +70,7 @@ class TaskRunner {
       throw error;
     }
 
-    logger.info(`Rolling back completed!`);
+    logger.info(`Rollback finished!`);
   };
 }
 

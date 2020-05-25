@@ -42,7 +42,6 @@ class Task {
         stack.push(step);
       }
     } catch (error) {
-      logger.info(`Start rolling back "${this.name}"...`);
       await this._rollback(...stack);
       throw error;
     }
@@ -64,6 +63,9 @@ class Task {
     if (!steps || steps.length === 0) {
       return;
     }
+
+    logger.info(`Start rolling back "${this.name}"...`);
+
     const reversed = steps.reverse();
     for (let i = 0; i < reversed.length; ++i) {
       const step = reversed[i];
