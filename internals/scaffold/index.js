@@ -31,6 +31,7 @@ const runner = new (require('./task_runner/task_runner'))(
   'Scaffold AWS project',
   ...tasks,
 );
+
 runner
   .execute()
   // eslint-disable-next-line no-underscore-dangle

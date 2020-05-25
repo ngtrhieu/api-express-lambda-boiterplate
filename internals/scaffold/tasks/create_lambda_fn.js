@@ -45,33 +45,6 @@ const task = (() => {
           ],
         };
 
-        // // Policy applied to the Lambda function about to create
-        // const policy = {
-        //   Version: '2012-10-17',
-        //   Statement: [
-        //     {
-        //       // For logging to CloudWatch
-        //       Effect: 'Allow',
-        //       Action: [
-        //         'logs:CreateLogGroup',
-        //         'logs:CreateLogStream',
-        //         'logs:PutLogEvents',
-        //       ],
-        //       Resource: `arn:aws:logs:${process.env.AWS_REGION}:${accountId}:*`,
-        //     },
-        //     {
-        //       // For creating VPC for its EC2 instance
-        //       Effect: 'Allow',
-        //       Action: [
-        //         'ec2:CreateNetworkInterface',
-        //         'ec2:DescribeNetworkInterfaces',
-        //         'ec2:DeleteNetworkInterface',
-        //       ],
-        //       Resource: `arn:aws:ec2:${process.env.AWS_REGION}:${accountId}:*`,
-        //     },
-        //   ],
-        // };
-
         const params = {
           AssumeRolePolicyDocument: JSON.stringify(rolePolicy),
           RoleName: lambdaRoleName,
@@ -88,6 +61,61 @@ const task = (() => {
         logger.debug(`Deleting IAM role ${lambdaRoleName}`);
         const iam = new AWS.IAM();
         await iam.deleteRole({ RoleName: lambdaRoleName }).promise();
+      },
+    }),
+
+    new Step({
+      name: 'Attach inline policy',
+
+      execute: async () => {
+        logger.debug(
+          'Attach an inline policy on the IAM Role above that allow Lambda to logs to CloudWatch and setup EC2 connecting to VPC',
+        );
+
+        const iam = new AWS.IAM();
+        await iam
+          .putRolePolicy({
+            PolicyDocument: JSON.stringify({
+              Version: '2012-10-17',
+              Statement: [
+                {
+                  // For logging to CloudWatch
+                  Effect: 'Allow',
+                  Action: [
+                    'logs:CreateLogGroup',
+                    'logs:CreateLogStream',
+                    'logs:PutLogEvents',
+                  ],
+                  Resource: `arn:aws:logs:${process.env.AWS_REGION}:${accountId}:*`,
+                },
+                {
+                  // For creating VPC for its EC2 instance
+                  Effect: 'Allow',
+                  Action: [
+                    'ec2:CreateNetworkInterface',
+                    'ec2:DescribeNetworkInterfaces',
+                    'ec2:DeleteNetworkInterface',
+                  ],
+                  Resource: `arn:aws:ec2:${process.env.AWS_REGION}:${accountId}:*`,
+                },
+              ],
+            }),
+            PolicyName: 'InlinePolicy',
+            RoleName: lambdaRoleName,
+          })
+          .promise();
+        logger.debug(`Attached inline policy for CloudWatchLogging`);
+      },
+
+      rollback: async () => {
+        logger.debug('Remove inline policy');
+        const iam = new AWS.IAM();
+        await iam
+          .deleteRolePolicy({
+            PolicyName: 'InlinePolicy',
+            RoleName: lambdaRoleName,
+          })
+          .promise();
       },
     }),
 
