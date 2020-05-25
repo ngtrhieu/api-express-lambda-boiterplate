@@ -25,22 +25,26 @@ class Step {
     this.name = name;
 
     this.execute = async () => {
-      logger.info(`- ${this.name}`);
-      try {
-        if (execute) await execute();
-      } catch (error) {
-        logger.error(`Executing ${this.name} failed due to:\n%s`, error);
-        throw error;
+      if (execute) {
+        try {
+          logger.info(`- ${this.name}`);
+          await execute();
+        } catch (error) {
+          logger.error(`Executing ${this.name} failed due to:\n%s`, error);
+          throw error;
+        }
       }
     };
 
     this.rollback = async () => {
-      logger.info(`- ${this.name}`);
-      try {
-        if (rollback) await rollback();
-      } catch (error) {
-        logger.error(`Rolling back ${this.name} failed due to:\n%s`, error);
-        throw error;
+      if (rollback) {
+        try {
+          logger.info(`- ${this.name}`);
+          await rollback();
+        } catch (error) {
+          logger.error(`Rolling back ${this.name} failed due to:\n%s`, error);
+          throw error;
+        }
       }
     };
   }

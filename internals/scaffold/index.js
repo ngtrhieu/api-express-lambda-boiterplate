@@ -22,8 +22,17 @@ const { profile, region } = argv;
 process.env.AWS_PROFILE = profile;
 process.env.AWS_REGION = region;
 
+const tasks = [
+  require('./tasks/task_create_repository'),
+  require('./tasks/create_lambda_fn'),
+];
+
 const runner = new (require('./task_runner/task_runner'))(
   'Scaffold AWS project',
-  require('./tasks/task_create_repository'),
+  ...tasks,
 );
-runner.execute().catch(() => process.exit(1));
+runner
+  .execute()
+  // eslint-disable-next-line no-underscore-dangle
+  .then(() => runner._rollback(...tasks))
+  .catch(() => process.exit(1));

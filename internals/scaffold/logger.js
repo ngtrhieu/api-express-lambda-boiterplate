@@ -1,9 +1,10 @@
 const winston = require('winston');
 
 const logger = winston.createLogger({
-  level: 'info',
+  level: 'debug',
   transports: [
     new winston.transports.Console({
+      level: 'debug',
       format: winston.format.combine(
         winston.format.colorize(),
         winston.format.splat(),
@@ -11,6 +12,7 @@ const logger = winston.createLogger({
       ),
     }),
     new winston.transports.File({
+      level: 'info',
       filename: `logs/scaffold-${new Date().toISOString()}.log`,
       format: winston.format.combine(
         winston.format.splat(),

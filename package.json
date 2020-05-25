@@ -16,7 +16,7 @@
     "lint": "eslint .",
     "lint:fix": "eslint --fix",
     "lint:staged": "lint-staged",
-    "zip": "yarn build:prod && cp package.json dist/package.json && cp yarn.lock dist/yarn.lock && yarn --cwd dist install --prod && cd dist && zip -r ../lambda.zip ./* && cd ..",
+    "zip": "yarn build:prod && cp package.json dist/package.json && cp yarn.lock dist/yarn.lock && yarn --cwd dist install --prod --silent && cd dist && zip -q -r ../lambda.zip ./* && cd ..",
     "scaffold": "node internals/scaffold/index"
   },
   "ntl": {
