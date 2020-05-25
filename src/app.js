@@ -1,10 +1,18 @@
-import { Router } from 'express';
+import express from 'express';
+import bodyParser from 'body-parser';
+import cors from 'cors';
+
 import { name, description, version, author, license } from '~/../package.json';
 
-const router = Router();
+import { loggerMiddleware } from './logger';
 
-router.get('/version', (request, response) => {
+const app = express();
+
+app.use(loggerMiddleware);
+app.use(cors({ exposedHeaders: ['Link'] }));
+app.use(bodyParser.json());
+app.get('/version', (request, response) => {
   response.status(200).send({ name, description, version, author, license });
 });
 
-export default router;
+export default app;

@@ -16,7 +16,8 @@
     "lint": "eslint .",
     "lint:fix": "eslint --fix",
     "lint:staged": "lint-staged",
-    "zip": "yarn build:prod && cp package.json dist/package.json && cp yarn.lock dist/yarn.lock && yarn --cwd dist install --prod && cd dist && zip -r ../lambda.zip ./* && cd .."
+    "zip": "yarn build:prod && cp package.json dist/package.json && cp yarn.lock dist/yarn.lock && yarn --cwd dist install --prod && cd dist && zip -r ../lambda.zip ./* && cd ..",
+    "scaffold": "node internals/scaffold/index"
   },
   "ntl": {
     "runner": "yarn",
@@ -24,7 +25,8 @@
       "build": "Start building a development build.",
       "build:prod": "Start building a production build.",
       "start": "Start a development server locally at port 3000 (or whatever port defined in the PORT var).",
-      "zip": "Build and package the production build into a zip file, ready to upload to Lambda"
+      "zip": "Build and package the production build into a zip file, ready to upload to Lambda",
+      "scaffold": "Scaffold a new AWS project"
     }
   },
   "pre-commit": "lint:staged",
@@ -68,6 +70,7 @@
     "ntl": "^5.0.0",
     "pre-commit": "^1.2.2",
     "prettier": "^2.0.5",
-    "rimraf": "^3.0.2"
+    "rimraf": "^3.0.2",
+    "yargs": "^15.3.1"
   }
 }

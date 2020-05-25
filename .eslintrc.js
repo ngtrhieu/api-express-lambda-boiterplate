@@ -29,6 +29,7 @@ module.exports = {
       2,
       { allowShortCircuit: true, allowTernary: true },
     ],
+    'no-plusplus': [2, { allowForLoopAfterthoughts: true }],
   },
 
   settings: {
