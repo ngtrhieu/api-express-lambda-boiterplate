@@ -31,20 +31,18 @@ class Task {
    */
   execute = async () => {
     if (!this.steps || this.steps.length === 0) {
-      logger.info('Nothing to execute');
       return;
     }
+
     const stack = [];
     try {
       for (let i = 0; i < this.steps.length; ++i) {
         const step = this.steps[i];
-        logger.info(`- ${stack.length + 1}/${this.steps.length}: ${step.name}`);
         await step.execute();
         stack.push(step);
       }
     } catch (error) {
-      logger.error(`Failed to execute task ${this.name} due to:\n%s`, error);
-      logger.info(`Start rolling back task ${this.name}...`);
+      logger.info(`Start rolling back "${this.name}"...`);
       await this._rollback(...stack);
       throw error;
     }
@@ -67,18 +65,9 @@ class Task {
       return;
     }
     const reversed = steps.reverse();
-    let stepNo = reversed.length;
-    const totalSteps = reversed.length;
-    try {
-      for (let i = 0; i < reversed.length; ++i) {
-        const step = reversed[i];
-        logger.info(`- Rollback ${stepNo}/${totalSteps}: ${step.name}`);
-        stepNo -= 1;
-        await step.rollback();
-      }
-    } catch (error) {
-      logger.error(`Failed to rollback task ${this.name} due to:\n%s`, error);
-      throw error;
+    for (let i = 0; i < reversed.length; ++i) {
+      const step = reversed[i];
+      await step.rollback();
     }
   };
 }

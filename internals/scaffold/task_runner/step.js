@@ -1,3 +1,5 @@
+const logger = require('../logger');
+
 /**
  * Represent a rollbackable Step.
  *
@@ -12,17 +14,35 @@
 class Step {
   /**
    * Construct a new Step.
-   * @param {string} the name of the step.
-   * @param {Promise} execute - the Promise function that resolve when the step run successfully. If the function
+   * @param {object} arg
+   * @param {string} arg.name - the name of the step.
+   * @param {Promise} arg.execute - the Promise function that resolve when the step run successfully. If the function
    * failed, clean up gracefully before reject.
-   * @param {Promise} rollback - the Promise function that undo the execution step. Resolve when rollback successfully.
+   * @param {Promise} arg.rollback - the Promise function that undo the execution step. Resolve when rollback successfully.
    */
-  constructor(name, execute, rollback) {
+  constructor({ name, execute, rollback }) {
     /** The name of this step */
     this.name = name;
 
-    this.execute = execute;
-    this.rollback = rollback;
+    this.execute = async () => {
+      logger.info(`- ${this.name}`);
+      try {
+        if (execute) await execute();
+      } catch (error) {
+        logger.error(`Executing ${this.name} failed due to:\n%s`, error);
+        throw error;
+      }
+    };
+
+    this.rollback = async () => {
+      logger.info(`- ${this.name}`);
+      try {
+        if (rollback) await rollback();
+      } catch (error) {
+        logger.error(`Rolling back ${this.name} failed due to:\n%s`, error);
+        throw error;
+      }
+    };
   }
 }
 

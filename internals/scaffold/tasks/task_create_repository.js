@@ -11,9 +11,24 @@ const { name, description } = JSON.parse(
 const task = new Task(
   'Create CocdeCommit repository',
 
-  new Step(
-    'Create repository',
-    () => {
+  new Step({
+    name: 'Check project name',
+    execute: () =>
+      new Promise((resolve, reject) => {
+        if (name === 'express-server-boiterplate') {
+          reject(
+            new Error(
+              'Please run `yarn init` to re-initialize your project with new name',
+            ),
+          );
+        }
+        resolve();
+      }),
+  }),
+
+  new Step({
+    name: 'Create repository',
+    execute: () => {
       const client = new AWS.CodeCommit();
       return client
         .createRepository({
@@ -22,13 +37,13 @@ const task = new Task(
         })
         .promise();
     },
-    () => {
+    rollback: () => {
       const client = new AWS.CodeCommit();
       return client.deleteRepository({
         repositoryName: name,
       });
     },
-  ),
+  }),
 );
 
 module.exports = task;

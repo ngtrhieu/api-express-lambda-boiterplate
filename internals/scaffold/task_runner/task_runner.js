@@ -34,32 +34,35 @@ class TaskRunner {
     try {
       for (let i = 0; i < this.tasks.length; ++i) {
         const task = this.tasks[i];
-        logger.info(
-          `Running task ${stack.length + 1}/${this.tasks.length}: ${task.name}`,
-        );
+        logger.info(`${stack.length + 1}/${this.tasks.length}: ${task.name}`);
         await task.execute();
         stack.push(task);
       }
     } catch (error) {
-      logger.info(`Start rolling back all ${stack.length} completed tasks...`);
+      logger.info(
+        `Start rolling back all other ${stack.length} completed tasks...`,
+      );
       await this._rollback(...stack);
       throw error;
     }
 
-    logger.error(`Finished!`);
+    logger.info(`Finished!`);
   };
 
   _rollback = async (...tasks) => {
     if (!tasks || tasks.length === 0) {
+      logger.info('Nothing to rollback');
       return;
     }
+
     const reversed = tasks.reverse();
     let taskNo = reversed.length;
     const totalTasks = reversed.length;
+
     try {
       for (let i = 0; i < reversed.length; ++i) {
         const task = reversed[i];
-        logger.info(`Rolling back tasks ${taskNo}/${totalTasks}: ${task.name}`);
+        logger.info(`${taskNo}/${totalTasks}: ${task.name}`);
         taskNo -= 1;
         await task.rollback();
       }
@@ -67,6 +70,8 @@ class TaskRunner {
       logger.error(`Failed to rollback. Stopping...`);
       throw error;
     }
+
+    logger.info(`Rolling back completed!`);
   };
 }
 
