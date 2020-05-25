@@ -8,15 +8,24 @@
   "license": "MIT",
   "private": true,
   "scripts": {
+    "cmd": "yarn run ntl --descriptions-only --autocomplete",
     "clean": "rimraf dist",
     "build": "yarn clean && cross-env NODE_ENV=development babel src -d dist",
     "build:prod": "yarn clean && cross-env NODE_ENV=production babel src -d dist",
-    "prestart": "yarn build",
-    "start": "node -r dotenv/config --enable-source-maps dist/local",
+    "start": "yarn build && node -r dotenv/config --enable-source-maps dist/local",
     "lint": "eslint .",
     "lint:fix": "eslint --fix",
     "lint:staged": "lint-staged",
     "zip": "yarn build:prod && cp package.json dist/package.json && cp yarn.lock dist/yarn.lock && yarn --cwd dist install --prod && cd dist && zip -r ../lambda.zip ./* && cd .."
+  },
+  "ntl": {
+    "runner": "yarn",
+    "descriptions": {
+      "build": "Start building a development build.",
+      "build:prod": "Start building a production build.",
+      "start": "Start a development server locally at port 3000 (or whatever port defined in the PORT var).",
+      "zip": "Build and package the production build into a zip file, ready to upload to Lambda"
+    }
   },
   "pre-commit": "lint:staged",
   "lint-staged": {
@@ -56,6 +65,7 @@
     "eslint-plugin-import": "^2.20.2",
     "eslint-plugin-prettier": "^3.1.3",
     "lint-staged": "^10.2.6",
+    "ntl": "^5.0.0",
     "pre-commit": "^1.2.2",
     "prettier": "^2.0.5",
     "rimraf": "^3.0.2"
