@@ -49,7 +49,7 @@ const task = (() =>
       rollback: async () => {
         logger.debug(`Deleting IAM role ${constants.lambdaRoleName}`);
         const iam = new AWS.IAM();
-        await iam.deleteRole({ RoleName: constants.slambdaRoleName }).promise();
+        await iam.deleteRole({ RoleName: constants.lambdaRoleName }).promise();
       },
     }),
 

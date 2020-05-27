@@ -72,7 +72,7 @@ class TaskRunner {
       }
     }
 
-    logger.info(`Task runner "${this.name}" rollback completed!`);
+    logger.info(`Task runner "${this.name}" rollback completed! 🤕🤕🤕`);
   };
 }
 
