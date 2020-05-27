@@ -48,7 +48,7 @@ class TaskRunner {
       throw error;
     }
 
-    logger.info(`Task runner "${this.name}" executed!`);
+    logger.info(`Task runner "${this.name}" executed! 🎉🎉🎉`);
   };
 
   _rollback = async (...tasks) => {

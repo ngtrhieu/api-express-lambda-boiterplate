@@ -226,7 +226,7 @@ const task = (() =>
         logger.debug(
           'Waiting about 30s for the above IAM role to propagate throughout the AWS system',
         );
-        logger.debug('NOTE TO SELF: Go grab a coffee');
+        logger.debug('NOTE TO SELF: Go grab a coffee ☕☕☕');
         await new Promise(resolve => setTimeout(resolve, 30000));
 
         logger.debug(`Creating pipeline ${constants.codePipelineProjectName}`);

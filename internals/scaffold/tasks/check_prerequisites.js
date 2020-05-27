@@ -42,7 +42,7 @@ const task = (() =>
         );
         const lambda = new AWS.Lambda();
         await lambda
-          .getFunction({ FunctionName: 'codepipeline-deploy-s3-to-lamba' })
+          .getFunction({ FunctionName: 'codepipeline-deploy-s3-to-lambda' })
           .promise();
       },
     }),

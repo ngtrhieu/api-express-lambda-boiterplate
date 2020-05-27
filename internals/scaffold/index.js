@@ -43,5 +43,5 @@ const { argv } = require('yargs')
   await runner.execute();
 
   // eslint-disable-next-line no-underscore-dangle
-  // await runner._rollback(...tasks);
+  await runner._rollback(...tasks);
 })();

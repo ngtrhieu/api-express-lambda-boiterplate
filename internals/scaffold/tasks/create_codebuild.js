@@ -131,7 +131,7 @@ const task = (() =>
         logger.debug(
           'Waiting about 30s for the above IAM role to propagate throughout the AWS system',
         );
-        logger.debug('NOTE TO SELF: Stand up and stretch');
+        logger.debug('NOTE TO SELF: Stand up and stretch 💪💪💪');
         await new Promise(resolve => setTimeout(resolve, 30000));
 
         logger.debug(`Creating CodeBuild project ${constants.projectName}`);
