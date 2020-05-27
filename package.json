@@ -1,5 +1,5 @@
 {
-  "name": "api-express-server-boiterplate-2",
+  "name": "api-express-server-boiterplate",
   "version": "0.0.1",
   "description": "A base express API server wrapped in AWS lambda..",
   "repository": "ssh://git-codecommit.ap-southeast-1.amazonaws.com/v1/repos/api-express-lambda-boiterplate",

@@ -23,8 +23,9 @@ process.env.AWS_PROFILE = profile;
 process.env.AWS_REGION = region;
 
 const tasks = [
-  require('./tasks/task_create_repository'),
+  require('./tasks/create_repository'),
   require('./tasks/create_lambda_fn'),
+  require('./tasks/create_pipeline'),
 ];
 
 const runner = new (require('./task_runner/task_runner'))(
@@ -33,6 +34,7 @@ const runner = new (require('./task_runner/task_runner'))(
 );
 
 runner
+  // ._rollback(...tasks)
   .execute()
   // eslint-disable-next-line no-underscore-dangle
   .then(() => runner._rollback(...tasks))

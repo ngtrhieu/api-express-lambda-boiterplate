@@ -1,0 +1,96 @@
+{
+  "pipeline": {
+    "artifactStore": {
+      "location": "api-express-server-boiterplate-2-codepipeline-artifacts",
+      "type": "S3"
+    },
+    "name": "api-express-server-boiterplate-2",
+    "roleArn": "arn:aws:iam::757627922266:role/api-express-server-boiterplate-2CodePipelineRole",
+    "stages": [
+      {
+        "actions": [
+          {
+            "actionTypeId": {
+              "category": "Source",
+              "owner": "AWS",
+              "provider": "CodeCommit",
+              "version": "1"
+            },
+            "configuration": {
+              "BranchName": "master",
+              "PollForSourceChanges": "false",
+              "RepositoryName": "api-express-server-boiterplate-2"
+            },
+            "inputArtifacts": [],
+            "name": "Source",
+            "namespace": "SourceVariables",
+            "outputArtifacts": [
+              {
+                "name": "SourceArtifact"
+              }
+            ],
+            "region": "ap-southeast-1",
+            "runOrder": 1
+          }
+        ],
+        "name": "Source"
+      },
+      {
+        "actions": [
+          {
+            "actionTypeId": {
+              "category": "Build",
+              "owner": "AWS",
+              "provider": "CodeBuild",
+              "version": "1"
+            },
+            "configuration": {
+              "ProjectName": "api-express-server-boiterplate-2"
+            },
+            "inputArtifacts": [
+              {
+                "name": "SourceArtifact"
+              }
+            ],
+            "name": "Build",
+            "namespace": "BuildVariables",
+            "outputArtifacts": [
+              {
+                "name": "BuildArtifact"
+              }
+            ],
+            "region": "ap-southeast-1",
+            "runOrder": 1
+          }
+        ],
+        "name": "Build"
+      },
+      {
+        "actions": [
+          {
+            "actionTypeId": {
+              "category": "Invoke",
+              "owner": "AWS",
+              "provider": "Lambda",
+              "version": "1"
+            },
+            "configuration": {
+              "FunctionName": "codepipeline-deploy-s3-to-lambda",
+              "UserParameters": "api-express-server-boiterplate-2"
+            },
+            "inputArtifacts": [
+              {
+                "name": "BuildArtifact"
+              }
+            ],
+            "name": "DeployFunctionCode",
+            "outputArtifacts": [],
+            "region": "ap-southeast-1",
+            "runOrder": 1
+          }
+        ],
+        "name": "Deploy"
+      }
+    ]
+  }
+}

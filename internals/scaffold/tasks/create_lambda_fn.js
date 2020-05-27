@@ -21,7 +21,7 @@ const task = (() => {
     require('../steps/check_project_name'),
 
     new Step({
-      name: 'Creating execution role for the lambda function',
+      name: 'Creating execution role for Lambda',
       execute: async () => {
         logger.debug(
           'Create a role for AWS Lambda to assume during its execution',
@@ -104,7 +104,7 @@ const task = (() => {
             RoleName: lambdaRoleName,
           })
           .promise();
-        logger.debug(`Attached inline policy for CloudWatchLogging`);
+        logger.debug(`Inline policy attached`);
       },
 
       rollback: async () => {
@@ -116,6 +116,7 @@ const task = (() => {
             RoleName: lambdaRoleName,
           })
           .promise();
+        logger.debug('Inline policy removed');
       },
     }),
 
