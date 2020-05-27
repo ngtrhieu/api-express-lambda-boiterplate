@@ -10,6 +10,9 @@ const codeCommitRepositoryName = projectName;
 /** CodeCommit repository description */
 const codeCommitRepositoryDescription = projectDescription;
 
+/** CodeCommit repository ARN */
+const codeCommitRepositoryArn = `arn:aws:codecommit:${process.env.AWS_REGION}:${process.env.AWS_ACCOUNT_ID}:${codeCommitRepositoryName}`;
+
 /** CodeCommit repository uri */
 const codeCommitRepositoryUrl = `ssh://git-codecommit.${process.env.AWS_REGION}.amazonaws.com/v1/repos/${codeCommitRepositoryName}`;
 
@@ -78,6 +81,11 @@ const codeBuildLogGroupArn = `/aws/codebuild/${projectName}`;
 const codePipelineProjectName = projectName;
 
 /**
+ * CodePipeline project ARN.
+ */
+const codePipelineProjectArn = `arn:aws:kms:${process.env.AWS_REGION}:${process.env.AWS_ACCOUNT_ID}:${codePipelineProjectName}`;
+
+/**
  * The name of the role assumed by CodePipeline when building the project.
  */
 const codePipelineRoleName = `${projectName}CodePipelineRole`;
@@ -92,12 +100,23 @@ const codePipelineRoleDescription = `IAM Role for CodePipeline to assume when ex
  */
 const codePipelineRoleArn = `arn:aws:iam::${process.env.AWS_ACCOUNT_ID}:role/${codePipelineRoleName}`;
 
+const cloudWatchRuleName = `${projectName}CloudWatchRule-ExecutePipeline`;
+
+const cloudWatchRuleDescription = `Trigger whenever the "master" branch of ${codeCommitRepositoryName} repository is pushed. Execute pipeline ${codePipelineProjectName} for project ${projectName}`;
+
+const cloudWatchRoleName = `${projectName}CloudWatchRole`;
+
+const cloudWatchRoleDescription = `IAM Role for CloudWatch to assume when watching code changes in CodeCommit and triggering CodePipeline execution for ${projectName}`;
+
+const cloudWatchRoleArn = `arn:aws:iam::${process.env.AWS_ACCOUNT_ID}:role/${cloudWatchRoleName}`;
+
 module.exports = {
   projectName,
   originalRepositoryUrl,
 
   codeCommitRepositoryName,
   codeCommitRepositoryDescription,
+  codeCommitRepositoryArn,
   codeCommitRepositoryUrl,
 
   lambdaFunctionName,
@@ -117,7 +136,14 @@ module.exports = {
   codeBuildLogGroupArn,
 
   codePipelineProjectName,
+  codePipelineProjectArn,
   codePipelineRoleName,
   codePipelineRoleDescription,
   codePipelineRoleArn,
+
+  cloudWatchRuleName,
+  cloudWatchRuleDescription,
+  cloudWatchRoleName,
+  cloudWatchRoleDescription,
+  cloudWatchRoleArn,
 };

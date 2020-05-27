@@ -37,11 +37,12 @@ const { argv } = require('yargs')
     require('./tasks/create_build_bucket'),
     require('./tasks/create_codebuild'),
     require('./tasks/create_pipeline'),
+    require('./tasks/create_cloudwatch_rule'),
   ];
 
   const runner = new TaskRunner('Scaffold AWS project', ...tasks);
   await runner.execute();
 
   // eslint-disable-next-line no-underscore-dangle
-  await runner._rollback(...tasks);
+  // await runner._rollback(...tasks);
 })();
