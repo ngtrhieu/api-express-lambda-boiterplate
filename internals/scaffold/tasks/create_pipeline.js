@@ -1,49 +1,15 @@
 /* eslint-disable import/order */
 /* eslint-disable import/no-extraneous-dependencies */
 const AWS = require('aws-sdk');
-// const shell = require('shelljs');
 const logger = require('../logger');
 const Task = require('../task_runner/task');
 const Step = require('../task_runner/step');
 
-const { name: projectName } = JSON.parse(
-  require('fs').readFileSync('package.json'),
-);
+const constants = require('./constants');
 
-const task = (() => {
-  let codePipelineRoleArn;
-  const codePipelineRoleName = `${projectName}CodePipelineRole`;
-  const bucketName = `${projectName.toLowerCase()}-codepipeline-artifacts`;
-
-  return new Task(
+const task = (() =>
+  new Task(
     'Create pipeline',
-
-    new Step({
-      name: 'Creating S3 bucket',
-      execute: async () => {
-        logger.debug(
-          `Creating a S3 bucket named ${bucketName} to store build artifacts`,
-        );
-
-        const s3 = new AWS.S3();
-        const params = {
-          Bucket: bucketName,
-          CreateBucketConfiguration: {
-            LocationConstraint: process.env.AWS_REGION,
-          },
-        };
-        await s3.createBucket(params).promise();
-
-        logger.debug(`Bucket ${bucketName} created`);
-      },
-
-      rollback: async () => {
-        logger.debug(`Deleting bucket ${bucketName}`);
-        const s3 = new AWS.S3();
-        await s3.deleteBucket({ Bucket: bucketName }).promise();
-        logger.debug(`Bucket ${bucketName} deleted`);
-      },
-    }),
 
     new Step({
       name: 'Create IAM Role',
@@ -66,23 +32,23 @@ const task = (() => {
 
         const params = {
           AssumeRolePolicyDocument: JSON.stringify(rolePolicy),
-          RoleName: codePipelineRoleName,
-          Description: `IAM Role for CodePipeline. Assigned to the CodePipeline project performing continuous delivery for project ${projectName}.`,
+          RoleName: constants.codePipelineRoleName,
+          Description: constants.codePipelineRoleDescription,
           MaxSessionDuration: 3600,
         };
 
         const iam = new AWS.IAM();
 
         const response = await iam.createRole(params).promise();
-        codePipelineRoleArn = response.Role.Arn;
-
-        logger.debug(`Role ${codePipelineRoleArn} created`);
+        logger.debug(`Role ${response.Role.Arn} created`);
       },
 
       rollback: async () => {
-        logger.debug(`Deleting IAM role ${codePipelineRoleName}`);
+        logger.debug(`Deleting IAM role ${constants.codePipelineRoleName}`);
         const iam = new AWS.IAM();
-        await iam.deleteRole({ RoleName: codePipelineRoleName }).promise();
+        await iam
+          .deleteRole({ RoleName: constants.codePipelineRoleName })
+          .promise();
       },
     }),
 
@@ -236,7 +202,7 @@ const task = (() => {
               ],
             }),
             PolicyName: 'InlinePolicy',
-            RoleName: codePipelineRoleName,
+            RoleName: constants.codePipelineRoleName,
           })
           .promise();
         logger.debug('Inline policy attached');
@@ -248,7 +214,7 @@ const task = (() => {
         await iam
           .deleteRolePolicy({
             PolicyName: 'InlinePolicy',
-            RoleName: codePipelineRoleName,
+            RoleName: constants.codePipelineRoleName,
           })
           .promise();
       },
@@ -263,15 +229,15 @@ const task = (() => {
         logger.debug('NOTE TO SELF: Go grab a coffee');
         await new Promise(resolve => setTimeout(resolve, 30000));
 
-        logger.debug(`Creating pipeline ${projectName}`);
+        logger.debug(`Creating pipeline ${constants.codePipelineProjectName}`);
         const params = {
           pipeline: {
             artifactStore: {
-              location: bucketName,
+              location: constants.artifactBucketName,
               type: 'S3',
             },
-            name: projectName,
-            roleArn: codePipelineRoleArn,
+            name: constants.codePipelineProjectName,
+            roleArn: constants.codePipelineRoleArn,
             stages: [
               {
                 actions: [
@@ -285,7 +251,7 @@ const task = (() => {
                     configuration: {
                       BranchName: 'master',
                       PollForSourceChanges: 'false',
-                      RepositoryName: projectName,
+                      RepositoryName: constants.codeCommitRepositoryName,
                     },
                     inputArtifacts: [],
                     name: 'Source',
@@ -311,7 +277,7 @@ const task = (() => {
                       version: '1',
                     },
                     configuration: {
-                      ProjectName: projectName,
+                      ProjectName: constants.codeBuildProjectName,
                     },
                     inputArtifacts: [
                       {
@@ -342,7 +308,7 @@ const task = (() => {
                     },
                     configuration: {
                       FunctionName: 'codepipeline-deploy-s3-to-lambda',
-                      UserParameters: projectName,
+                      UserParameters: constants.lambdaFunctionName,
                     },
                     inputArtifacts: [
                       {
@@ -368,13 +334,14 @@ const task = (() => {
       },
 
       rollback: async () => {
-        logger.debug(`Deleting pipeline ${projectName}`);
+        logger.debug(`Deleting pipeline ${constants.codePipelineProjectName}`);
         const client = new AWS.CodePipeline();
-        await client.deletePipeline({ name: projectName }).promise();
-        logger.debug(`pipeline ${projectName} deleted`);
+        await client
+          .deletePipeline({ name: constants.codePipelineProjectName })
+          .promise();
+        logger.debug(`pipeline ${constants.codePipelineProjectName} deleted`);
       },
     }),
-  );
-})();
+  ))();
 
 module.exports = task;

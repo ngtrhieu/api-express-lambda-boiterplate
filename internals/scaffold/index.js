@@ -3,6 +3,9 @@
 /* eslint-disable import/order */
 /* eslint-disable import/no-extraneous-dependencies, global-require */
 
+const AWS = require('aws-sdk');
+const TaskRunner = require('./task_runner/task_runner');
+
 // Parse command options
 const { argv } = require('yargs')
   .option('profile', {
@@ -18,24 +21,27 @@ const { argv } = require('yargs')
   .help()
   .alias('help', 'h');
 
-const { profile, region } = argv;
-process.env.AWS_PROFILE = profile;
-process.env.AWS_REGION = region;
+(async () => {
+  const { profile, region } = argv;
+  process.env.AWS_PROFILE = profile;
+  process.env.AWS_REGION = region;
 
-const tasks = [
-  require('./tasks/create_repository'),
-  require('./tasks/create_lambda_fn'),
-  require('./tasks/create_pipeline'),
-];
+  const sts = new AWS.STS();
+  const stsResponse = await sts.getCallerIdentity({}).promise();
+  process.env.AWS_ACCOUNT_ID = stsResponse.Account;
 
-const runner = new (require('./task_runner/task_runner'))(
-  'Scaffold AWS project',
-  ...tasks,
-);
+  const tasks = [
+    require('./tasks/check_prerequisites'),
+    require('./tasks/create_repository'),
+    require('./tasks/create_lambda_fn'),
+    require('./tasks/create_build_bucket'),
+    require('./tasks/create_codebuild'),
+    require('./tasks/create_pipeline'),
+  ];
 
-runner
-  // ._rollback(...tasks)
-  .execute()
+  const runner = new TaskRunner('Scaffold AWS project', ...tasks);
+  await runner.execute();
+
   // eslint-disable-next-line no-underscore-dangle
-  .then(() => runner._rollback(...tasks))
-  .catch(() => process.exit(1));
+  // await runner._rollback(...tasks);
+})();

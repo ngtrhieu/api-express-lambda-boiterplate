@@ -7,18 +7,11 @@ const logger = require('../logger');
 const Task = require('../task_runner/task');
 const Step = require('../task_runner/step');
 
-const { name: projectName } = JSON.parse(
-  require('fs').readFileSync('package.json'),
-);
+const constants = require('./constants');
 
-const task = (() => {
-  let accountId;
-  const lambdaRoleName = `${projectName}ApiLambdaRole`;
-
-  return new Task(
+const task = (() =>
+  new Task(
     `Create new lambda function`,
-
-    require('../steps/check_project_name'),
 
     new Step({
       name: 'Creating execution role for Lambda',
@@ -26,10 +19,6 @@ const task = (() => {
         logger.debug(
           'Create a role for AWS Lambda to assume during its execution',
         );
-
-        const sts = new AWS.STS();
-        const stsResponse = await sts.getCallerIdentity({}).promise();
-        accountId = stsResponse.Account;
 
         const rolePolicy = {
           // Allow lambda service to assume this role
@@ -47,8 +36,8 @@ const task = (() => {
 
         const params = {
           AssumeRolePolicyDocument: JSON.stringify(rolePolicy),
-          RoleName: lambdaRoleName,
-          Description: `IAM Role for executing lambda function. Assigned to the lambda running express API server for project ${projectName}.`,
+          RoleName: constants.lambdaRoleName,
+          Description: constants.lambdaRoleDescription,
           MaxSessionDuration: 3600,
         };
 
@@ -58,9 +47,9 @@ const task = (() => {
       },
 
       rollback: async () => {
-        logger.debug(`Deleting IAM role ${lambdaRoleName}`);
+        logger.debug(`Deleting IAM role ${constants.lambdaRoleName}`);
         const iam = new AWS.IAM();
-        await iam.deleteRole({ RoleName: lambdaRoleName }).promise();
+        await iam.deleteRole({ RoleName: constants.slambdaRoleName }).promise();
       },
     }),
 
@@ -86,7 +75,7 @@ const task = (() => {
                     'logs:CreateLogStream',
                     'logs:PutLogEvents',
                   ],
-                  Resource: `arn:aws:logs:${process.env.AWS_REGION}:${accountId}:*`,
+                  Resource: `arn:aws:logs:${process.env.AWS_REGION}:${process.env.AWS_ACCOUNT_ID}:*`,
                 },
                 {
                   // For creating VPC for its EC2 instance
@@ -96,12 +85,12 @@ const task = (() => {
                     'ec2:DescribeNetworkInterfaces',
                     'ec2:DeleteNetworkInterface',
                   ],
-                  Resource: `arn:aws:ec2:${process.env.AWS_REGION}:${accountId}:*`,
+                  Resource: `arn:aws:ec2:${process.env.AWS_REGION}:${process.env.AWS_ACCOUNT_ID}:*`,
                 },
               ],
             }),
             PolicyName: 'InlinePolicy',
-            RoleName: lambdaRoleName,
+            RoleName: constants.lambdaRoleName,
           })
           .promise();
         logger.debug(`Inline policy attached`);
@@ -113,7 +102,7 @@ const task = (() => {
         await iam
           .deleteRolePolicy({
             PolicyName: 'InlinePolicy',
-            RoleName: lambdaRoleName,
+            RoleName: constants.lambdaRoleName,
           })
           .promise();
         logger.debug('Inline policy removed');
@@ -141,11 +130,11 @@ const task = (() => {
           Code: {
             ZipFile: require('fs').readFileSync('lambda.zip'),
           },
-          FunctionName: projectName,
+          FunctionName: constants.lambdaFunctionName,
           Handler: 'index.handle',
-          Role: `arn:aws:iam::${accountId}:role/${lambdaRoleName}`,
+          Role: constants.lambdaRoleArn,
           Runtime: 'nodejs12.x',
-          Description: `Lambda function executing api-express-server for ${projectName}`,
+          Description: constants.lambdaFunctionDescription,
           Environment: {
             Variables: {
               NODE_ENV: 'production',
@@ -164,12 +153,15 @@ const task = (() => {
       },
 
       rollback: async () => {
-        logger.debug(`Deleting Lambda function ${projectName}`);
+        logger.debug(
+          `Deleting Lambda function ${constants.lambdaFunctionName}`,
+        );
         const lambda = new AWS.Lambda();
-        await lambda.deleteFunction({ FunctionName: projectName }).promise();
+        await lambda
+          .deleteFunction({ FunctionName: constants.lambdaFunctionName })
+          .promise();
       },
     }),
-  );
-})();
+  ))();
 
 module.exports = task;

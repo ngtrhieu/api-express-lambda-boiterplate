@@ -1,3 +1,4 @@
+/* eslint-disable global-require */
 /* eslint-disable import/order */
 /* eslint-disable import/no-extraneous-dependencies */
 const AWS = require('aws-sdk');
@@ -6,76 +7,66 @@ const logger = require('../logger');
 const Task = require('../task_runner/task');
 const Step = require('../task_runner/step');
 
-const {
-  name: projectName,
-  description: projectDescription,
-  repository,
-} = JSON.parse(require('fs').readFileSync('package.json'));
+const constants = require('./constants');
 
 const task = (() =>
   new Task(
     'Create CodeCommit repository',
 
     new Step({
-      name: 'Check project name',
-      execute: async () => {
-        if (projectName === 'api-express-server-boiterplate') {
-          throw new Error(
-            'Please run `yarn init` to re-initialize your project with new name',
-          );
-        }
-      },
-    }),
-
-    new Step({
       name: 'Create repository',
       execute: async () => {
-        logger.debug(`Create a new CodeCommit repository`);
+        logger.debug(
+          `Create a new CodeCommit repository ${constants.codeCommitRepositoryName}`,
+        );
+
         const client = new AWS.CodeCommit();
         const { repositoryMetadata } = await client
           .createRepository({
-            repositoryName: projectName,
-            repositoryDescription: projectDescription,
+            repositoryName: constants.codeCommitRepositoryName,
+            repositoryDescription: constants.codeCommitRepositoryDescription,
           })
           .promise();
 
         logger.debug(`Repository ${repositoryMetadata.Arn} created`);
       },
+
       rollback: async () => {
-        logger.debug(`Deleting repository ${projectName}`);
+        logger.debug(
+          `Deleting repository ${constants.codeCommitRepositoryName}`,
+        );
+
         const client = new AWS.CodeCommit();
         await client
           .deleteRepository({
-            repositoryName: projectName,
+            repositoryName: constants.codeCommitRepositoryName,
           })
           .promise();
-      },
-    }),
-
-    new Step({
-      name: 'Is Git available?',
-      execute: async () => {
-        if (!shell.which('git')) {
-          throw new Error('git cannot be found.');
-        }
       },
     }),
 
     new Step({
       name: 'Push code to new repo',
       execute: async () => {
-        const url = `ssh://git-codecommit.${process.env.AWS_REGION}.amazonaws.com/v1/repos/${projectName}`;
-        logger.debug(`Update the git origin to ${url}`);
+        logger.debug(
+          `Update the git origin to ${constants.codeCommitRepositoryUrl}`,
+        );
 
         shell.exec('git remote remove origin >> /dev/null');
-        shell.exec(`git remote add origin ${url} >> /dev/null`);
+        shell.exec(
+          `git remote add origin ${constants.codeCommitRepositoryUrl} >> /dev/null`,
+        );
       },
 
       rollback: async () => {
-        logger.debug(`Change the git origin back to ${repository}`);
+        logger.debug(
+          `Change the git origin back to ${constants.originalRepositoryUrl}`,
+        );
 
         shell.exec('git remote remove origin >> /dev/null');
-        shell.exec(`git remote add origin ${repository} >> /dev/null`);
+        shell.exec(
+          `git remote add origin ${constants.originalRepositoryUrl} >> /dev/null`,
+        );
       },
     }),
 
