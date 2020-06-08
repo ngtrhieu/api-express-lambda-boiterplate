@@ -18,7 +18,8 @@
     "lint:staged": "lint-staged",
     "zip": "yarn build:prod && cp package.json dist/package.json && cp yarn.lock dist/yarn.lock && yarn --cwd dist install --prod --silent && cd dist && zip -q -r ../lambda.zip ./* && cd ..",
     "scaffold": "node internals/scaffold/index",
-    "commit": "git-cz"
+    "commit": "git-cz",
+    "release": "standard-version"
   },
   "ntl": {
     "runner": "yarn",
@@ -75,6 +76,7 @@
     "prettier": "^2.0.5",
     "rimraf": "^3.0.2",
     "shelljs": "^0.8.4",
+    "standard-version": "^8.0.0",
     "yargs": "^15.3.1"
   },
   "config": {
