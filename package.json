@@ -17,7 +17,8 @@
     "lint:fix": "eslint --fix",
     "lint:staged": "lint-staged",
     "zip": "yarn build:prod && cp package.json dist/package.json && cp yarn.lock dist/yarn.lock && yarn --cwd dist install --prod --silent && cd dist && zip -q -r ../lambda.zip ./* && cd ..",
-    "scaffold": "node internals/scaffold/index"
+    "scaffold": "node internals/scaffold/index",
+    "commit": "git-cz"
   },
   "ntl": {
     "runner": "yarn",
@@ -58,7 +59,9 @@
     "babel-eslint": "^10.1.0",
     "babel-plugin-root-import": "^6.5.0",
     "babel-preset-minify": "^0.5.1",
+    "commitizen": "^4.1.2",
     "cross-env": "^7.0.2",
+    "cz-conventional-changelog": "3.2.0",
     "dotenv": "^8.2.0",
     "eslint": "^7.1.0",
     "eslint-config-airbnb-base": "^14.1.0",
@@ -73,5 +76,10 @@
     "rimraf": "^3.0.2",
     "shelljs": "^0.8.4",
     "yargs": "^15.3.1"
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
   }
 }
