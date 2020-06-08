@@ -83,7 +83,7 @@ const task = (() =>
                 },
                 {
                   Effect: 'Allow',
-                  Resource: `arn:aws:s3:::${constants.artifactBucketName}`,
+                  Resource: `arn:aws:s3:::${constants.artifactBucketName}/*`,
                   Action: [
                     's3:PutObject',
                     's3:GetObject',
