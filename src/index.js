@@ -9,7 +9,7 @@ import awsServerlessExpress from 'aws-serverless-express';
 import app from './app';
 
 const server = awsServerlessExpress.createServer(app);
-exports.handler = (event, context) => {
+exports.handle = (event, context) => {
   // HACK to make winston works!
   delete console._stdout;
   delete console._stderr;

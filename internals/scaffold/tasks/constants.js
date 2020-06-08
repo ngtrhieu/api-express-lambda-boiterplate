@@ -83,7 +83,7 @@ const codePipelineProjectName = projectName;
 /**
  * CodePipeline project ARN.
  */
-const codePipelineProjectArn = `arn:aws:kms:${process.env.AWS_REGION}:${process.env.AWS_ACCOUNT_ID}:${codePipelineProjectName}`;
+const codePipelineProjectArn = `arn:aws:codepipeline:${process.env.AWS_REGION}:${process.env.AWS_ACCOUNT_ID}:${codePipelineProjectName}`;
 
 /**
  * The name of the role assumed by CodePipeline when building the project.
