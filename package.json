@@ -44,7 +44,7 @@
   },
   "dependencies": {
     "@babel/runtime": "^7.9.6",
-    "aws-sdk": "^2.683.0",
+    "aws-sdk": "^2.814.0",
     "aws-serverless-express": "^3.3.8",
     "body-parser": "^1.19.0",
     "cors": "^2.8.5",
